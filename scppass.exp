@@ -1,0 +1,125 @@
+#! /usr/local/bin/expect
+#
+# @(!--#) @(#) scppass.exp, version 004, 06-july-2020
+#
+# run the scp command and if it prompts for a password
+# then look in the environment variable SCPPASS and
+# send that
+#
+
+########################################################################
+
+#
+# Main
+#
+
+# get program/script name
+set progname [file tail $argv0]
+
+# set argc
+set argc [llength $argv]
+
+# set the password environment variable name
+set passenvvar "SCPPASS"
+
+# set a long timeout
+set timeoutinseconds 60
+
+# set yesnoresponse to no
+set yesnoresponse "no"
+
+# has the command line got a new password environment variable name
+if {$argc >= 2} {
+  if {[lindex $argv 0] == "-e"} {
+    set passenvvar [lindex $argv 1]
+    set argv [lrange $argv 2 [expr $argc - 1]]
+    set argc [expr $argc - 2]
+  }
+}
+
+# has the command line got a timeout argument
+if {$argc >= 2} {
+  if {[lindex $argv 0] == "-t"} {
+    set timeoutinseconds [lindex $argv 1]
+    set argv [lrange $argv 2 [expr $argc - 1]]
+    set argc [expr $argc - 2]
+  }
+}
+
+# has the command line got a -y argument
+if {$argc >= 1} {
+  if {[lindex $argv 0] == "-y"} {
+    set yesnoresponse "yes"
+    set argv [lrange $argv 1 [expr $argc - 1]]
+    set argc [expr $argc - 1]
+  }
+}
+
+# any arguments for scp (needs at a minumum one argument)
+if {$argc < 1} {
+  send_error "$progname: not enough command line arguments\n"
+  exit 1
+}
+
+# set timeout
+set timeout $timeoutinseconds
+
+# display timeout and pasword environment variable name
+puts "Password environment variable: $passenvvar, timeout: $timeoutinseconds seconds, yes/no response: $yesnoresponse."
+
+if {0} {
+  puts "$longtimeout"
+  puts "$passenvvar"
+  puts "$argc"
+  puts "$argv"
+}
+
+# start the scp command with the command line arguments
+eval spawn scp $argv
+
+# keep a count of the times the password prompt is detected
+set passwordcount 0
+
+# loop forever
+while {1} {
+  expect {
+    eof {
+      # normal exit when scp exits
+      break
+    }
+    timeout {
+      # a timeout is an error
+      send_error "\n$progname: timeout after $longtimeout seconds - something has gone wrong!\n"
+      exit 1
+    }
+    "Are you sure you want to continue connecting (yes/no)? " {
+      # answer no here
+      if {$yesnoresponse == "yes"} {
+        send "yes\r"
+      } else {
+        send_error "\n*** Assuming it is NOT ok to continue connecting!!! ***\n"
+        send "no\r"
+      }
+    }
+    "'s password: " {
+      # password prompt detected
+      incr passwordcount
+      if {$passwordcount > 1} {
+        send_error "\n$progname: password being asked for more than once!\n"
+        exit 1
+      }
+      if {[catch {set password $env($passenvvar)}] != 0} {
+        send_error "\n$progname: cannot get value of password environment variable \"$passenvvar\"\n"
+        exit 1
+      }
+      if {$password == ""} {
+        send_error "\n$progname: password environment variable \"$passenvvar\" is the empty null string\n"
+        exit 1
+      }
+      send "$password\r"
+    }
+  }
+}
+
+# if control gets here then exit success
+exit 0
