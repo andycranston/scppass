@@ -15,7 +15,7 @@ copying processes.
 
 This link:
 
-[Technical Demonstration Video of the scppass expect script](youtube.xxx)
+[Technical Demonstration Video of the scppass expect script](https://youtu.be/j5G639stqnU)
 
 shows the `scppass` expect script in action.
 
