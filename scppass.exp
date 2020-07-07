@@ -1,6 +1,6 @@
 #! /usr/local/bin/expect
 #
-# @(!--#) @(#) scppass.exp, version 004, 06-july-2020
+# @(!--#) @(#) scppass.exp, version 005, 07-july-2020
 #
 # run the scp command and if it prompts for a password
 # then look in the environment variable SCPPASS and
@@ -65,7 +65,7 @@ if {$argc < 1} {
 set timeout $timeoutinseconds
 
 # display timeout and pasword environment variable name
-puts "Password environment variable: $passenvvar, timeout: $timeoutinseconds seconds, yes/no response: $yesnoresponse."
+puts "Password variable: $passenvvar, timeout: $timeoutinseconds seconds, yes/no response: $yesnoresponse."
 
 if {0} {
   puts "$longtimeout"
