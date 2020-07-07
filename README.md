@@ -59,19 +59,20 @@ would work.
 (*) NOTE: `notmypassword` is not a password I have ever used!!! It is
 here purely for this documentation.
 
-(**) NEVER do this on anything but a demonstration environment. There are
-two obvious reasons why. One, someone might be looking over
-your shoulder and see the password. Two, most `bash` like shells
-store each typed command in a history file which could be read by other users
-with elevated priviledges (e.g. anyone who can `sudo` to get `root` access).
+(**) NEVER do this on anything except for a demonstration
+environment. Here are two reasons why. One, someone might be looking
+over your shoulder and see the password. Two, most `bash` like shells
+store each typed command in a history file which could be read by other
+users with elevated priviledges (e.g. anyone who can `sudo` to get
+`root` access).
 
 A better way to set environment variables like `SCPPASS` to passwords is
 to use my utility called `setpw` - see:
 
 [Set Windows/UNIX/Linux environment variables with a password but keep the password hidden](https://github.com/andycranston/setpw)
 
-Now that the `SCPPASS` environment variable has been set you can 
-use `scppass` to copy a file from a remote system like this:
+Now that the `SCPPASS` environment variable has been set you can use the
+`scppass` expect script to copy a file from a remote system like this:
 
 ```
 scppass andyc@nserv:/home/andyc/myfile myfile
@@ -211,6 +212,18 @@ ATTENTION: USE THIS COMMAND LINE OPTION WITH EXTREME CAUTION!!!
 
 Remember that you are responsible for the security of the systems
 you administer.
+
+## Command line option order
+
+The `scppass` expect script processes command line options in a rather
+simple way. If specifying two or possibly all three command line
+options the order they are specified matters otherwise they will not be
+recognised.
+
+The `-e` option, if specified, must be specified first. The
+`-y` option, if specified, must be specified last. The `-t` option,
+if specified with either of the `-e` or `-y` options must be specified
+after `-e` and before `-y`.
 
 ## A final word on public/private keys
 
